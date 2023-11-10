@@ -1,12 +1,14 @@
 import random
 from collections import deque
-
-import torch
-from helper import plot
-from model import Linear_QNet, QTrainer
-from snake_game import Direction, Point, SnakeGameAI
+from pathlib import Path
 
 import numpy as np
+import torch
+
+from helper import plot
+from model import Linear_QNet, QTrainer
+from recorder import GIFMaker
+from snake_game import Direction, Point, SnakeGameAI
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -116,6 +118,7 @@ def train():
     record = 0
     agent = Agent()
     game = SnakeGameAI()
+    gif_maker = GIFMaker()
     print("GO!")
     while True:
         # get old state
@@ -129,8 +132,11 @@ def train():
         agent.train_short_memory(state_old, final_move, reward, state_new, done)
 
         agent.remember(state_old, final_move, reward, state_new, done)
+        game.save_screenshot(gif_maker.next_img_file())
 
         if done:
+            gif_maker.make_gif(Path(f"./gifs/game_{agent.n_games:04}.gif"), duration=50)
+            gif_maker.clear()
             game.reset()
             agent.n_games += 1
             agent.train_long_memory()

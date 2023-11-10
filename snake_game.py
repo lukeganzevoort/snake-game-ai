@@ -1,6 +1,9 @@
+import io
 import random
 from collections import namedtuple
 from enum import Enum
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 import pygame
@@ -226,3 +229,6 @@ class SnakeGameAI:
             y -= BLOCK_SIZE
 
         self.head = Point(x, y)
+
+    def save_screenshot(self, fileobj: Union[io.BytesIO, Path]):
+        pygame.image.save(self.display, fileobj, "jpg")
